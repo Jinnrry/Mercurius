@@ -1,0 +1,25 @@
+{
+  "common": {
+    "token": "xbbbdasdf"
+  },
+  "server": {
+    "port": 11011,
+    "ip": "127.0.0.1"
+  },
+  "client": {
+    "services": [
+      {
+        "local_ip": "127.0.0.1",
+        "local_port": 80,
+        "remot_port": 8881,
+        "type": "tcp"
+      },
+      {
+        "local_ip": "127.0.0.1",
+        "local_port": 3306,
+        "remot_port": 3309,
+        "type": "tcp"
+      }
+    ]
+  }
+}
