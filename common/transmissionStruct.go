@@ -3,6 +3,7 @@ package common
 import (
 	"Mercurius/common/encryption"
 	"encoding/binary"
+	log "github.com/sirupsen/logrus"
 )
 
 type TransmissionStruct struct {
@@ -39,6 +40,12 @@ func (t *TransmissionStruct) Convert2Byte() []byte {
 	ret = append(ret, dataLength...)
 	ret = append(ret, t.Data...)
 
+	// 校验数据包长度
+	if len(t.Data) < TransmissionDataLength {
+		padding := make([]byte, TransmissionDataLength-len(t.Data))
+		ret = append(ret, padding...)
+	}
+
 	// 数据包加密
 	config, _ = GetConfig("")
 	encrData, _ := encryption.Encrypt(ret, []byte(config.Common.Token))
@@ -47,11 +54,12 @@ func (t *TransmissionStruct) Convert2Byte() []byte {
 }
 
 func FactoryTransmission(encrData []byte) TransmissionStruct {
-
 	// 数据包解密
 	config, _ = GetConfig("")
-	data, _ := encryption.Decrypt(encrData, []byte(config.Common.Token))
-
+	data, err := encryption.Decrypt(encrData, []byte(config.Common.Token))
+	if err != nil {
+		log.Errorf("数据包解密失败！ %v", err)
+	}
 	requestId := binary.LittleEndian.Uint64(data[0:8])
 	serviceId := binary.LittleEndian.Uint16(data[8:10])
 	dataLength := binary.LittleEndian.Uint16(data[10:12])

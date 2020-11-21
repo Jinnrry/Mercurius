@@ -13,7 +13,17 @@ Mercurius基于TCP实现了私有协议，使用AES-CBC-128对数据包加密，
 
 ## 如何使用
 
-[下载](https://github.com/Jinnrry/Mercurius/releases) 你对应的平台和架构，下载配置文件模板，修改配置文件。 在内网机器上运行client程序，在公网机器运行server程序。
+[下载](https://github.com/Jinnrry/Mercurius/releases) 你对应的平台和架构，下载配置文件模板，修改配置文件。 
+
+在内网机器上运行client程序：
+```shell script
+client -c ./config.json
+```
+在公网机器运行server程序:
+```shell script
+server -c ./config.json
+```
+
 
 ## 配置文件说明
 

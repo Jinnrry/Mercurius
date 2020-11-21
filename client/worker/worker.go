@@ -3,7 +3,7 @@ package worker
 import (
 	"Mercurius/common"
 	"fmt"
-	"log"
+	log "github.com/sirupsen/logrus"
 	"net"
 	"sync"
 )
@@ -46,9 +46,9 @@ func connHandleLocal(requestId uint64, serviceId uint16, conn net.Conn) {
 			poolKey := fmt.Sprintf("%d_%d", serviceId, requestId)
 			mercuriusClientConnPool.Delete(poolKey)
 
-			data := []byte(fmt.Sprintf("%d,%d\n", requestId, serviceId))
+			data := []byte(fmt.Sprintf("%d,%d", requestId, serviceId))
 
-			log.Printf("通知服务端断开socket %d %d", requestId, serviceId)
+			log.Debug("通知服务端断开socket %d %d", requestId, serviceId)
 			// 通知服务端断开socket
 			GetClientWorkerInstance().SendData2Server(common.TransmissionStruct{
 				RequestId:  common.CloseSocket,
@@ -67,7 +67,7 @@ func connHandleLocal(requestId uint64, serviceId uint16, conn net.Conn) {
 			Data:       buf,
 		}
 
-		log.Println("收到本地Socket数据,长度%d", cnt)
+		log.Debug("收到本地Socket数据,长度%d", cnt)
 
 		// 发送给server
 		GetClientWorkerInstance().SendData2Server(pkg)
@@ -80,7 +80,7 @@ func createLocalSocket(config common.Config, requestId uint64, serverId uint16, 
 	local_conn, err := net.Dial("tcp",
 		fmt.Sprintf("%s:%d", config.Client.Services[serverId].LocalIp, config.Client.Services[serverId].LocalPort))
 	if err == nil {
-		log.Println("创建本地连接成功")
+		log.Debug("创建本地连接成功")
 		mercuriusClientConnPool.Store(poolKey, local_conn)
 		go connHandleLocal(requestId, serverId, local_conn)
 	} else {

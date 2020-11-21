@@ -4,22 +4,42 @@ import (
 	"Mercurius/common"
 	"Mercurius/server/worker"
 	"flag"
-	"log"
+	log "github.com/sirupsen/logrus"
+	"os"
 )
 
-func main() {
-	// 初始化配置文件
+var configPath string
+var showVersion bool
+var config common.Config
 
-	var configPath string
-	flag.StringVar(&configPath, "c", "./config.json", "config文件位置,默认./config.json")
+// 日志初始化
+func init() {
+	// 初始化配置文件
+	flag.StringVar(&configPath, "c", "./config.json", "config文件位置")
+	flag.BoolVar(&showVersion, "v", false, "显示程序版本")
 	flag.Parse()
 
-	config, err := common.GetConfig(configPath)
-
-	if err != nil {
-		log.Fatal("配置文件加载错误:%v", err)
+	if showVersion {
+		common.PrintVersion("Mercurius Server")
+		os.Exit(0)
 	}
 
+	var err error
+	config, err = common.GetConfig(configPath)
+
+	if err != nil {
+		log.Fatalf("配置文件加载错误:%v", err)
+	}
+
+	log.SetOutput(os.Stdout)
+	log.SetLevel(log.DebugLevel)
+}
+
+func main() {
+	serverStart(config)
+}
+
+func serverStart(config common.Config) {
 	// 启动worker
 	for idx, item := range config.Client.Services {
 		go worker.CreateWorker(idx, item.RemotPort)
@@ -27,9 +47,9 @@ func main() {
 
 	// 启动master
 	master := worker.GetMasterInstance()
-	err = master.Run(config.Server.Port)
+	err := master.Run(config.Server.Port)
 	if err != nil {
-		log.Fatal("程序启动失败:%v", err)
+		log.Fatalf("程序启动失败:%v", err)
 	}
 
 }

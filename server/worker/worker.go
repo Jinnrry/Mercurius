@@ -3,7 +3,7 @@ package worker
 import (
 	"Mercurius/common"
 	"fmt"
-	"log"
+	log "github.com/sirupsen/logrus"
 	"net"
 	"sync"
 )
@@ -14,17 +14,17 @@ var RequestConnPool sync.Map
 func CreateWorker(serviceId int, port int) {
 	listen, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
-		log.Fatalf("error listen:%v", err)
+		log.Errorf("error listen:%v", err)
 		return
 	}
 	defer listen.Close()
 	for {
 		if requestConn, err := listen.Accept(); err == nil {
-			log.Println("Request 接入")
+			log.Debug("Request 接入")
 
 			go requestHandle(serviceId, requestConn)
 		} else {
-			log.Fatalf("accept error:%v", err)
+			log.Errorf("accept error:%v", err)
 		}
 	}
 
@@ -55,7 +55,7 @@ func requestHandle(serviceId int, requestConn net.Conn) {
 		cnt, err := requestConn.Read(buf)
 		//数据读尽、读取错误 关闭 socket 连接
 		if cnt == 0 || err != nil {
-			log.Println("request socket断开")
+			log.Debug("request socket断开")
 
 			requestConn.Close()
 			RequestConnPool.Delete(poolKey)
@@ -76,7 +76,7 @@ func requestHandle(serviceId int, requestConn net.Conn) {
 		_, err = GetMasterInstance().SendData2Client(data)
 		// 写入client错误，关闭调request socket
 		if err != nil {
-			log.Println("request socket断开")
+			log.Debug("request socket断开")
 			requestConn.Close()
 			RequestConnPool.Delete(poolKey)
 			SendCloseCommand(requestId, uint16(serviceId))
