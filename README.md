@@ -30,7 +30,8 @@ server -c ./config.json
 ```json
 {
   "common": {
-    "token": "xbbbdasdf"  //传输秘钥
+    "token": "xbbbdasdf",  //传输秘钥
+    "protocol": "tcp" //传输协议，目前只支持tcp,websocket协议正在开发中
   },
   "server": {
     "port": 11011,     //客户端和服务端通讯端口
