@@ -25,7 +25,7 @@ func init() {
 	}
 
 	var err error
-	config, err = common.GetConfig(configPath)
+	config, err = common.InitConfig(configPath)
 
 	if err != nil {
 		log.Fatalf("配置文件加载错误:%v", err)

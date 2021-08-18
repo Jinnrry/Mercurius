@@ -49,7 +49,6 @@ func (m *TcpMaster) Run(port int) error {
 
 // 接收client来的数据
 func (m *TcpMaster) clientDataHandle(conn net.Conn) {
-
 	//循环读取RequestClient数据流
 	for {
 		//网络数据流读入 buffer
@@ -66,7 +65,7 @@ func (m *TcpMaster) clientDataHandle(conn net.Conn) {
 		dataPackage := common.FactoryTransmission(buf)
 
 		if !m.verify && dataPackage.RequestId != common.VerifyKey {
-			// 验证未通过切不是权限验证的数据包
+			// 验证未通过且不是权限验证的数据包
 			conn.Close()
 			m.verify = false
 			log.Info("权限校验失败！关闭连接")
@@ -74,7 +73,7 @@ func (m *TcpMaster) clientDataHandle(conn net.Conn) {
 		}
 
 		if dataPackage.RequestId == common.VerifyKey {
-			config, _ := common.GetConfig("")
+			config := common.GetConfig()
 			if string(dataPackage.GetData()) == config.Common.Token {
 				log.Info("权限校验通过")
 				m.verify = true

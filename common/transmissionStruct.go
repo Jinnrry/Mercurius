@@ -47,7 +47,7 @@ func (t *TransmissionStruct) Convert2Byte() []byte {
 	}
 
 	// 数据包加密
-	config, _ = GetConfig("")
+	config = GetConfig()
 	encrData, _ := encryption.Encrypt(ret, []byte(config.Common.Token))
 
 	return encrData
@@ -55,7 +55,7 @@ func (t *TransmissionStruct) Convert2Byte() []byte {
 
 func FactoryTransmission(encrData []byte) TransmissionStruct {
 	// 数据包解密
-	config, _ = GetConfig("")
+	config = GetConfig()
 	data, err := encryption.Decrypt(encrData, []byte(config.Common.Token))
 	if err != nil {
 		log.Errorf("数据包解密失败！ %v", err)

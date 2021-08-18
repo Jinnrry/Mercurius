@@ -6,7 +6,7 @@ import (
 
 func TestGetConfig(t *testing.T) {
 
-	res, err := GetConfig("../config.json")
+	res, err := InitConfig("../config.json")
 
 	if err != nil {
 		t.Errorf("配置文件读取错误:%v", err)
